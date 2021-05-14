@@ -41,7 +41,7 @@ JS编译分三个步骤，词法分析、语法分析以及代码生成，编译
 
 **AST**
 
-
+recast、[抽象语法树](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API#node_objects)
 
 **事件循环机制**
 
