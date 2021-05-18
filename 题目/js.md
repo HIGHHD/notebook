@@ -51,7 +51,7 @@ recast、[抽象语法树](https://developer.mozilla.org/en-US/docs/Mozilla/Proj
 
 所有的任务可以分为同步任务和异步任务，同步任务，顾名思义，就是立即执行的任务，同步任务一般会直接进入到主线程中执行；而异步任务，就是异步执行的任务，比如ajax网络请求，setTimeout 定时函数等都属于异步任务，异步任务会通过任务队列( Event Queue )的机制来进行协调。具体的可以用下面的图来大致说明一下：
 
-![](N:\Documents\notebook\题目\js-1.jpg)
+![](.\js-1.jpg)
 
 同步和异步任务分别进入不同的执行环境，同步的进入主线程，即主执行栈，异步的进入 Event Queue 。主线程内的任务执行完毕为空，会去 Event Queue 读取对应的任务，推入主线程执行。 上述过程的不断重复就是我们说的 Event Loop (事件循环)。
 
@@ -64,7 +64,7 @@ recast、[抽象语法树](https://developer.mozilla.org/en-US/docs/Mozilla/Proj
 
 可以用一张图来说明下流程：
 
-![](N:\Documents\notebook\题目\js-2.jpg)
+![](.\js-2.jpg)
 
 规范中规定，task分为两大类, 分别是 Macro Task （宏任务）和 Micro Task（微任务）, 并且每个宏任务结束后, 都要清空所有的微任务,这里的 Macro Task也是我们常说的 task ，有些文章并没有对其做区分，后面文章中所提及的task皆看做宏任务( macro task)。
 
@@ -125,7 +125,7 @@ console.log('script end');
 
 首先，事件循环从宏任务 (macrotask) 队列开始，最初始，宏任务队列中，只有一个 scrip t(整体代码)任务；当遇到任务源 (task source) 时，则会先分发任务到对应的任务队列中去。所以，就和上面例子类似，首先遇到了console.log，输出 script start； 接着往下走，遇到 setTimeout 任务源，将其分发到任务队列中去，记为 timeout1； 接着遇到 promise，new promise 中的代码立即执行，输出 promise1, 然后执行 resolve ,遇到 setTimeout ,将其分发到任务队列中去，记为 timemout2, 将其 then 分发到微任务队列中去，记为 then1； 接着遇到 console.log 代码，直接输出 script end 接着检查微任务队列，发现有个 then1 微任务，执行，输出then1 再检查微任务队列，发现已经清空，则开始检查宏任务队列，执行 timeout1,输出 timeout1； 接着执行 timeout2，输出 timeout2 至此，所有的都队列都已清空，执行完毕。其输出的顺序依次是：script start, promise1, script end, then1, timeout1, timeout2
 
-![](N:\Documents\notebook\题目\js-3.jpg)
+![](.\js-3.jpg)
 
 有个小 tip：从规范来看，microtask 优先于 task 执行，所以如果有需要优先执行的逻辑，放入microtask 队列会比 task 更早的被执行。
 
@@ -196,7 +196,10 @@ nginx 跨域原理： 通过nginx配置一个代理服务器（域名与domain1�
 
 **缓存机制，304、强缓存**
 
+200强缓存、304协商缓存
 
+![](.\js-4.png)
+![](.\js-5.png)
 
 **web安全、xss，csrf**
 
@@ -213,16 +216,14 @@ csrf防范方法：验证 HTTP Referer 字段；在请求地址中添加 token �
 node是对错误处理要求比较高的语言，假如对错误处理没有到位可能会造成程序进程退出
 
 > https://zhuanlan.zhihu.com/p/123857666
->
-> 
 
 **koa中间件机制、解决了什么问题、怎么实现**
 
-
+解决了express中，具有的回调陷阱问题，优化了开发体验。`KOA`中间件通过`async/await`来在不同中间件之间交换控制权，工作机制和**栈**结构非常相似
 
 **如何理解前后端分离**
 
-
+首先要明确前后端的界限，我认为，前端应该侧重于页面展示、路由跳转、数据渲染、用户交互、部分数据逻辑处理、前端缓存；后端侧重于数据存储、数据缓存、数据处理、接口实现、会话等，以前的前后端令人诟病的一点就是前后台代码绑定到极致，增加了再次开发的难度，增加了后台服务器压力，我理解的前后端分离就是，前后端应该专注于自己的长项，资源得到合理利用，既不是代码上的完全隔离也不是开发人员上的完全隔离
 
 **react ssr 实现难点、如何区分服务端环境还是客户端环境**
 
@@ -230,11 +231,14 @@ node是对错误处理要求比较高的语言，假如对错误处理没有到�
 
 **多实例如何保存登录状态，也就是session如何存储**
 
-
+session做标识，保证从哪来到哪去，有个缺点是，如果宕机，客户需要重新登录
+集中存储会话
 
 **快应用和微信小程序底层机制区别**
 
-
+快应用比微信小程序更进一步的是，使用native渲染而不是webview渲染。
+再加上硬件资源扶持，在体验上更上一层楼。
+但不能用webview后，也有一些麻烦，就是可以用的api目前还比微信少很多。
 
 **常用设计模式有哪些，具体应用场景是什么**
 
