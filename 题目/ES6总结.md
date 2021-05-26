@@ -45,13 +45,61 @@ Object.prototype.__proto__ === null	//true
 
 函数的`prototype`属性，这是是函数的特有属性，在 JavaScript 中，函数（function）是允许拥有属性的，
 
+**new 到底做了些什么**
+
+以构造器的prototype属性为原型，创建新对象（隐性执行）；
+
+将this，也就是上一步的新对象和调用参数传给构造器，执行构造函数的代码；
+
+返回新对象（隐性执行）；
+
+```js
+let Fu = function (name, age) {
+    this.name_a = name;
+    this.showName = function () {
+        console.log(this.name, 'show')
+    }
+};
+Fu.prototype.sayName = function () {
+    console.log(this.name_a);
+};
+let Zi = function (name, age) {
+    Fu.call(this, name);
+    this.age = age;
+}
+Zi.prototype = new Fu();
+Zi.prototype.constructor = Zi;	// 为什么不需要这一步
+//自己定义的new方法
+let newMethod = function (O, ...rest) {
+    // 1.以构造器的prototype属性为原型，创建新对象；
+    let zi = Object.create(O.prototype);
+    // 2.将this和调用参数传给构造器执行
+    Fu.call(zi, ...rest);
+    // 3.返回第一步的对象
+    return zi;
+};
+//创建实例，将构造函数Fu与形参作为参数传入
+const zi = newMethod(Zi, 'echo', 26);
+const zi2 = new Zi('echo', 26);
+// zi.sayName() //'echo';
+
+//最后检验，与使用new的效果相同
+zi instanceof Fu//true
+zi.hasOwnProperty('name_a')//true
+zi.hasOwnProperty('age')//false 为什么
+zi2.hasOwnProperty('age')//true
+zi.hasOwnProperty('sayName')//false
+```
+
+
+
 **继承**
 
 1.原型链继承，将子类的原型链指向父类对象实例
 
 优点：可继承构造函数的属性，父类构造函数的属性，父类原型的属性，且父类方法只创建一遍
 
-缺点：无法向父类构造函数传参；且所有实例共享父类实例属性，父类属性为引用类型的话，更改一个子类实例，所有子类实例都将发生变化
+缺点：无法向父类构造函数传参；且所有实例共享父类实例属性，父类属性为引用类型的话，更改一个子类实例，所有子类实例都将发生变化；继承单一，无法实现多继承
 
 ```js
 function Fu(w){ this.arr=['red','blue','green'], this.x = w; } 
@@ -65,7 +113,7 @@ a.print0 === b.print0 // true
 
 优点：可解决原型链继承的缺点
 
-缺点：不可继承父类的原型链方法，构造函数不可复用，每次创建实例都会创建一遍方法
+缺点：不可继承父类的原型链方法，父类方法不可复用，每次创建实例都会创建一遍方法
 
 ```js
 function Fu(w){ this.arr=['red','blue','green'], this.x = w; this.print0 = function() {
@@ -77,7 +125,7 @@ Fu.prototype.printarr = function() {
 }
 var a = new Zi(1)
 var b = new Fu(2)
-a.printarr()  // a.printarr is not a function
+// a.printarr()  // a.printarr is not a function
 a.print0()
 a.arr.push('black') // a.arr ["red", "blue", "green", "black"]
 b.printarr()
@@ -87,9 +135,36 @@ console.log(c.arr) // c.arr ["red", "blue", "green"]
 a.print0 === c.print0 // false
 ```
 
-3.组合继承，
+3.组合继承，原型链继承和构造函数继承组合
+
+优点：若父类的方法定义在原型对象上，可以实现方法复用，可以向父类构造函数传参，并且不共享父类的引用属性
+
+缺点：构造函数内的方法任然不可以实现复用，由于调用了两次父类的构造方法，会存在一份多余的父类实例属性
 
 ```js
-
+function Fu(name) {
+    this.name = name;
+    this.colors = ['red','blue','green'];
+    this.showName = function () {
+        console.log(this.name, 'show')
+    }
+}
+Fu.prototype.getName = function () {
+    consolo.log(this.name);
+}
+function Zi(name, age) {
+    Fu.call(this, name);
+    this.age = age;
+}
+Zi.prototype = new Fu();
+var zi = new Zi('z', '18');
+zi.colors.push('block');
+console.log(zi.name); // kevin
+console.log(zi.age); // 18
+console.log(zi.colors); // ["red", "blue", "green", "black"]
+var zi2 = new Zi('daisy', '20');
+console.log(zi2.name); // daisy
+console.log(zi2.age); // 20
+console.log(zi2.colors); // ["red", "blue", "green"]
 ```
 
