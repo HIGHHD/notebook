@@ -72,6 +72,7 @@ Zi.prototype.constructor = Zi;	// 为什么不需要这一步
 //自己定义的new方法
 let newMethod = function (O, ...rest) {
     // 1.以构造器的prototype属性为原型，创建新对象；
+    // Object.create()方法创建一个新对象，使用现有的对象来提供新创建的对象的__proto__
     let zi = Object.create(O.prototype);
     // 2.将this和调用参数传给构造器执行
     Fu.call(zi, ...rest);
