@@ -47,6 +47,20 @@ Object.prototype.__proto__ === null	//true
 
 **new 到底做了些什么**
 
+> The **`new` operator** lets developers create an instance of a user-defined object type or of one of the built-in object types that has a constructor function.
+>
+> The **`new`** keyword does the following things:
+>
+> 1. Creates a blank, plain JavaScript object.
+>
+> 2. Adds a property to the new object (`__proto__`) that links to the constructor function's prototype object
+>
+>    **Note:** Properties/objects added to the construction function prototype are therefore accessible to all instances created from the constructor function (using `new`).
+>
+> 3. Binds the newly created object instance as the `this` context (i.e. all references to `this` in the constructor function now refer to the object created in the first step).
+>
+> 4. Returns `this` if the function doesn't return an object.
+
 以构造器的prototype属性为原型，创建新对象（隐性执行）；
 
 将this，也就是上一步的新对象和调用参数传给构造器，执行构造函数的代码；
@@ -64,20 +78,25 @@ Fu.prototype.sayName = function () {
     console.log(this.name_a);
 };
 let Zi = function (name, age) {
+    console.log('1', this)
     Fu.call(this, name);
+    console.log('2', this)
     this.age = age;
+    console.log('3', this)
 }
 Zi.prototype = new Fu();
-Zi.prototype.constructor = Zi;	// 为什么不需要这一步
+// Zi.prototype.constructor = Zi;	// 为什么不需要这一步，因为Zi自身就在原型链上，Zi就是构造方法
 //自己定义的new方法
 let newMethod = function (O, ...rest) {
     // 1.以构造器的prototype属性为原型，创建新对象；
-    // Object.create()方法创建一个新对象，使用现有的对象来提供新创建的对象的__proto__
-    let zi = Object.create(O.prototype);
+    //let o = Object.create(O.prototype);
+    let o = {__proto__: O.prototype}; //都可以
     // 2.将this和调用参数传给构造器执行
-    Fu.call(zi, ...rest);
+    // O.call(o, ...rest);
+    O.bind(o, ...rest)();
+    console.log(O.name);
     // 3.返回第一步的对象
-    return zi;
+    return o;
 };
 //创建实例，将构造函数Fu与形参作为参数传入
 const zi = newMethod(Zi, 'echo', 26);
@@ -87,7 +106,7 @@ const zi2 = new Zi('echo', 26);
 //最后检验，与使用new的效果相同
 zi instanceof Fu//true
 zi.hasOwnProperty('name_a')//true
-zi.hasOwnProperty('age')//false 为什么
+zi.hasOwnProperty('age')//true
 zi2.hasOwnProperty('age')//true
 zi.hasOwnProperty('sayName')//false
 ```
@@ -140,10 +159,11 @@ a.print0 === c.print0 // false
 
 优点：若父类的方法定义在原型对象上，可以实现方法复用，可以向父类构造函数传参，并且不共享父类的引用属性
 
-缺点：构造函数内的方法任然不可以实现复用，由于调用了两次父类的构造方法，会存在一份多余的父类实例属性
+缺点：构造函数内的方法任然不可以实现复用，调用了两次父类的构造方法(赋值prototype时)
 
 ```js
 function Fu(name) {
+    console.log('fu');
     this.name = name;
     this.colors = ['red','blue','green'];
     this.showName = function () {
@@ -157,7 +177,7 @@ function Zi(name, age) {
     Fu.call(this, name);
     this.age = age;
 }
-Zi.prototype = new Fu();
+Zi.prototype = new Fu();	//这样才可以把Fu的属性加到Zi类
 var zi = new Zi('z', '18');
 zi.colors.push('block');
 console.log(zi.name); // kevin
@@ -169,3 +189,64 @@ console.log(zi2.age); // 20
 console.log(zi2.colors); // ["red", "blue", "green"]
 ```
 
+4.组合继承优化方式
+
+```js
+function Fu(name) {
+    console.log('fu');
+    this.name = name;
+    this.colors = ['red','blue','green'];
+    this.showName = function () {
+        console.log(this.name, 'show')
+    }
+}
+Fu.prototype.getName = function () {
+    console.log(this.name);
+}
+function Zi(name, age) {
+    Fu.call(this, name);
+    this.age = age;
+}
+Zi.prototype = Fu.prototype;	//优化调用两次父类构造方法，主要是获取Fu原型链上的属性，其他通过call获取
+Zi.prototype = Object.create(Fu.prototype)	//优化原型链，Object.create,可以实现原型隔离，在子类原型添加修改方法不会影响父类，通过Object.create(Fu.prototype).__proto__任然可以找到getName
+Zi.prototype.constructor = Zi; //个人觉得这一步可以略过，Zi本来就在最后一层原型链上
+```
+
+**class语法糖**
+
+```js
+class Fu {
+    constructor(a) {
+        this.a = a;
+        this.colors = ['red','blue','green'];
+        this.showName = function () {	//位于实例上
+            console.log(this.a, 'show')
+        }
+    }
+    showName2() {	//位于原型对象上
+        console.log(this.a, 'show2')
+    }
+}
+class Zi extends Fu {
+    constructor(a) {
+        super(a);
+        this.b = a + 's'; //位于实例上
+    }
+    showName2() {	//位于原型对象上，和父类隔离
+        console.log(this.a, 'show2')
+    }
+    showName3() {	//位于原型对象上
+        console.log(this.b, 'show2')
+    }
+}
+```
+
+
+
+**Promise**
+
+1.概述：Promise是异步编程的一种解决方案，从语法上讲，Promise是一个对象，可以获取异步操作的消息
+2.目的： （1）避免回调地狱的问题（2）Promise对象提供了简洁的API，使得控制异步操作更加容易
+3.Promise有三种状态：pendding //正在请求，rejected //失败，resolved //成功
+4.基础用法：new Promise(function(resolve,reject){ })
+resolved,rejected函数：在异步事件状态pendding->resolved回调成功时，通过调用resolved函数返回结果；当异步操作失败时，回调用rejected函数显示错误信息
