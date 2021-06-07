@@ -278,7 +278,7 @@ MVVM是Model-View-ViewModel的
 
 
 
-**关于AMD、CMD、CommonJS、ES6**
+**关于AMD、CMD、CommonJS、ES6、UMD**
 
 AMD是RequireJS在推广过程中对模块定义的规范化，它是一个概念。RequireJS是这个概念的实现，是一个**依赖前置、异步定义**的框架
 
@@ -331,6 +331,31 @@ ES6模块
 2. 对于只读来说，即不允许修改引入变量的值，import的变量是只读的，不论是基本数据类型还是复杂数据类型。当模块遇到import命令时，就会生成一个只读引用。等到脚本真正执行时，再根据这个只读引用，到被加载的那个模块里面去取值。
 3. 对于动态来说，原始值发生变化，import加载的值也会发生变化。不论是基本数据类型还是复杂数据类型。
 4. 循环加载时，ES6模块是动态引用。只要两个模块之间存在某个引用，代码就能够执行。
+
+**UMD** 叫做通用模块定义规范（Universal Module Definition）。也是随着大前端的趋势所诞生，它可以通过运行时或者编译时让同一个代码模块在使用 CommonJs、CMD 甚至是 AMD 的项目中运行。未来同一个 JavaScript 包运行在浏览器端、服务区端甚至是 APP 端都只需要遵守同一个写法就行了。
+
+它没有自己专有的规范，是集结了 CommonJs、CMD、AMD 的规范于一身，举例实现
+
+```js
+((root, factory) => {
+    if (typeof define === 'function' && define.amd) {
+        //AMD
+        define(['jquery'], factory);
+    } else if (typeof exports === 'object') {
+        //CommonJS
+        var $ = requie('jquery');
+        module.exports = factory($);
+    } else {
+        root.testModule = factory(root.jQuery);
+    }
+})(this, ($) => {
+    //todo
+});
+```
+
+
+
+
 
 **js的6个属性描述对象**
 
