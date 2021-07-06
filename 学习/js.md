@@ -455,10 +455,6 @@ Geoko的主要流程：
 
 ![img](https://pic4.zhimg.com/80/v2-2eb78d456d03dcf2e02f78a1bd81896f_720w.jpg)
 
-详细介绍请参考：
-
-[浏览器渲染原理及流程 - 李某龙 - 博客园](https://link.zhihu.com/?target=https%3A//www.cnblogs.com/slly/p/6640761.html)[www.cnblogs.com![图标](https://pic3.zhimg.com/v2-b2b7c07bd7f5af231cdeaa0c3804a686_180x120.jpg)](https://link.zhihu.com/?target=https%3A//www.cnblogs.com/slly/p/6640761.html)
-
 七、断开连接：
 
 TCP四次挥手：
@@ -471,6 +467,3 @@ TCP四次挥手：
 
 第四次挥手：Client收到FIN后，Client进入TIME_WAIT状态，接着发送一个ACK给Server，确认序号为收到序号+1，Server进入CLOSED状态，完成四次挥手。
 
-参考文献：
-
-[从输入url到页面展示到底发生了什么 - 都市烟火 - 博客园](https://link.zhihu.com/?target=https%3A//www.cnblogs.com/duhuo/p/5172479.html)
