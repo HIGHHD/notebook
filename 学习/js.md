@@ -280,9 +280,9 @@ MVVM是Model-View-ViewModel的
 
 ### 关于AMD、CMD、CommonJS、ES6、UMD
 
-AMD是RequireJS在推广过程中对模块定义的规范化，它是一个概念。RequireJS是这个概念的实现，是一个**依赖前置、异步定义**的框架
+AMD是RequireJS在推广过程中对模块定义的规范化，它是一个概念。RequireJS是这个概念的实现，是一个**依赖前置、异步定义**的框架，依赖包使用的时候才执行
 
-CMD是SeaJS在推广过程中的对模块定义的规范化，是一个同步模块的定义，是SeaJS的一个标准，是一个**依赖就近**的框架
+CMD是SeaJS在推广过程中的对模块定义的规范化，是一个同步模块的定义，是SeaJS的一个标准，是一个**依赖就近**的框架，依赖包使用的时候才引用，并执行
 
 AMD都是用`define()`定义，使用`require`加载，用于前端浏览器
 
