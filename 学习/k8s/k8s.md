@@ -44,7 +44,7 @@ yum-config-manager \
     --add-repo \
     https://download.docker.com/linux/centos/docker-ce.repo
 	
-yum install docker-ce docker-ce-cli containerd.io
+yum install docker-ce docker-ce-cli containerd.io -y
 ```
 
 >参考 https://docs.docker.com/engine/install/centos/
@@ -235,7 +235,9 @@ subjects:
 - kind: ServiceAccount
   name: admin-user
   namespace: kubernetes-dashboard
-  EOF
+EOF
+
+延长token时间 arg处 设置参数--token-ttl=0
 
 执行 kubectl describe secrets -n kubernetes-dashboard
 

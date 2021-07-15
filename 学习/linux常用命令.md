@@ -29,7 +29,7 @@ touch /etc/pki/CA/index.txt //建立ca的证书库
 /etc/pki/CA/private  # 用于存放CA的私钥
 
 openssl genrsa -out /etc/pki/CA/private/cakey.pem	// 生成根证书密钥
-openssl req -key /etc/pki/CA/private/cakey.pem -new -x509 -days 7300 -sha256 -extensions v3_ca -out /etc/pki/CA/cacert.pem // CA生成自签名证书，这个证书是自签名的根证书
+openssl req -key /etc/pki/CA/private/cakey.pem -new -x509 -days 3650 -sha256 -extensions v3_ca -out /etc/pki/CA/cacert.pem // CA生成自签名证书，这个证书是自签名的根证书
 
 以上就完成了根证书的相关操作，下一步可以颁发证书了。生成和签发服务器身份验证证书，注意证书是自签名的，浏览器会提示不受信任
 》 查看证书 openssl x509 -in ***.pem -text -noout
@@ -86,5 +86,31 @@ openssl x509 -req -days 3650 -in ca.csr -signkey private/cakey.pem -extfile /etc
 openssl genrsa -out /etc/pki/CA/private/k8s-key.pem
 openssl req -new -key private/k8s-key.pem -extensions v3_req -out k8s.csr
 openssl x509 -req -extfile /etc/pki/tls/openssl.cnf -extensions v3_req -CA cacert.pem -CAkey private/cakey.pem -CAcreateserial -in k8s.csr -out certs/k8s-cert.pem
+
+
+```
+
+## 分区
+
+### 将home分区和root分区合并
+
+```shell
+# 把/home内容备份，然后将/home文件系统所在的逻辑卷删除，扩大/root文件系统，新建/home：
+tar cvf /tmp/home.tar /home    #备份/home  没东西可以不备份
+# 记录一下 home下有多少可用空间  ，比如2G
+umount /home    #卸载/home，如果无法卸载，先终止使用/home文件系统的进程
+lvremove /dev/centos/home    # 删除/home所在的lv
+lvextend -l +100%FREE /dev/centos/root    # 扩展/root所在的lv，增加/home的大小
+xfs_growfs /dev/centos/root    #扩展/root文件系统
+df -h # 查询新分区
+```
+
+## IP配置
+
+```
+cd /etc/sysconfig/network-scripts
+vi ifcfg-网卡
+systemctl daemon-reload
+systemctl restart network
 ```
 
