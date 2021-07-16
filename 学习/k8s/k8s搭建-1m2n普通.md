@@ -222,7 +222,7 @@ eyJhbGciOiJSUzI1NiIsImtpZCI6IjFSb0FsdDFhWFl6Qm52c3l4djdLTGRYNEdwbFlZSmNmaFNyZVgx
 
 ```
 helm repo add ckotzbauer https://ckotzbauer.github.io/helm-charts
-
+// 设置该class为default
 helm upgrade --install nfs-client-provisioner --set nfs.server=192.168.202.159 --set nfs.path=/home/k8s-nfs --set storageClass.defaultClass=true ckotzbauer/nfs-client-provisioner
 
 
@@ -244,5 +244,8 @@ spec:
 添加
 - --feature-gates=RemoveSelfLink=false
 Kubelet 会监听该文件的变化，会加载这个配置
+
+// harbor admin 密码获取
+kubectl get secret --namespace default harbor-core-envvars -o jsonpath="{.data.HARBOR_ADMIN_PASSWORD}" | base64 --decode
 ```
 
