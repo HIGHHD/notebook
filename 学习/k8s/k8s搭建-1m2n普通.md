@@ -60,7 +60,7 @@ modprobe br_netfilter
 sysctl -a | grep net.bridge.bridge #查看是否有以下配置 将桥接的IPv4流量传递到iptables的链
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
-# 若无则设置，主要等于号两边不要有空格，否则会宝座sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-iptables : No such file or directory
+# 若无则设置，主要等于号两边不要有空格，否则会报错sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-iptables : No such file or directory
 sysctl -w "net.bridge.bridge-nf-call-ip6tables=1"
 sysctl -w "net.bridge.bridge-nf-call-iptables=1"
 # 生效配置
