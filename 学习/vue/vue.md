@@ -37,3 +37,4 @@ data props computed watch methods他们之间的生成顺序是什么呢？
 解决方法则是推荐采取**异步回调**的方法，然后传参进去，严格遵守vue的生命周期就可以解决 推荐 es6 的promise。
 
 数据请求一般在`created`生命周期钩子里做，因为data已经初始化、dom还没有挂载
+
