@@ -114,3 +114,11 @@ systemctl daemon-reload
 systemctl restart network
 ```
 
+## sed
+
+```shell
+sed -i s/deb.debian.org/mirrors.aliyun.com/g /etc/apt/sources.list
+sed -i s/security.debian.org/mirrors.aliyun.com/g /etc/apt/sources.list
+```
+
+http://security.debian.org/debian-security
