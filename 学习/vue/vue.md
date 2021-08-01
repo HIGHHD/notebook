@@ -38,3 +38,9 @@ data props computed watch methods他们之间的生成顺序是什么呢？
 
 数据请求一般在`created`生命周期钩子里做，因为data已经初始化、dom还没有挂载
 
+
+
+[12个vue高频原理面试题（附分析）-js教程-PHP中文网](https://www.php.cn/js-tutorial-455048.html)
+
+[vue面试题的介绍（附答案）-js教程-PHP中文网](https://www.php.cn/js-tutorial-416386.html)
+
