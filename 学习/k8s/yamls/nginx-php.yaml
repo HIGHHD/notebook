@@ -29,7 +29,7 @@ metadata:
   labels:
     k8s-app: nginxphp
 data:
-  nginxconf: |
+  "nginx.conf": |
     user  nginx;
     worker_processes  auto;
     
@@ -58,30 +58,55 @@ data:
       
       gzip  on;
       
-      #include /etc/nginx/conf.d/*.conf;
-      server {
-        listen       80;
-        listen  [::]:80;
-        server_name  localhost;
-        root /usr/share/nginx/html;
-        location / {
-          index index.html index.htm;
-        }
-        error_page   500 502 503 504  /50x.html;
-        location = /favicon.ico { log_not_found off; access_log off; }
-        location = /robots.txt  { access_log off; log_not_found off; }
-        location ~ \.php$ {
-          fastcgi_pass   127.0.0.1:9000;
-          fastcgi_index  index.php;
-          fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
-          include   fastcgi_params;
-        }
-        location ~ /\.ht {
-          deny  all;
-        }
-      }
+      include /etc/nginx/conf.d/default.conf;
     }
 
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-default-conf
+  namespace: sczq
+  labels:
+    k8s-app: nginxphp
+data:
+  "default.conf": |
+    server {
+      listen       80;
+      listen  [::]:80;
+      server_name  localhost;
+      root /mnt;
+      location / {
+        index index.html index.htm;
+      }
+      error_page   500 502 503 504  /50x.html;
+      location /50x.html {
+        root   /usr/share/nginx/html;
+      }
+      location /ws/ {
+        rewrite ^/?ws/(.*)$ /WebStation/Sites/$1 break;
+      }
+      location ~* \.(ttf|ttc|otf|eot|woff|woff2|css|js|html|json|md|mp4)$ {
+        add_header Access-Control-Allow-Origin *;
+        add_header Access-Control-Allow-Methods GET,OPTIONS;
+        if ($request_method = 'OPTIONS') {
+          return 204;
+        }
+        expires 30d;
+      }
+      location = /favicon.ico { log_not_found off; access_log off; }
+      location = /robots.txt  { access_log off; log_not_found off; }
+      location ~ \.php$ {
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include   fastcgi_params;
+      }
+      location ~ /\.ht {
+        deny  all;
+      }
+    }
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -127,40 +152,31 @@ spec:
           volumeMounts:
             - name: nginx-conf
               mountPath: /etc/nginx/nginx.conf
-              subPath: nginxconf
+              subPath: nginx.conf
+            - name: nginx-default-conf
+              mountPath: /etc/nginx/conf.d
             - name: www
-              mountPath: /usr/share/nginx/html
+              mountPath: /mnt
         - name: php
           image: "php:8.1-rc-fpm-alpine3.14"
           imagePullPolicy: Always
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                  - "adduser"
-                  - "-D"
-                  - "-g"
-                  - "nginx"
-                  - "-s"
-                  - "/sbin/nologin"
-                  - "-d"
-                  - "/usr/share/nginx/html"
-                  - "nginx"
           ports:
             - containerPort: 9000
               protocol: TCP
           volumeMounts:
             - name: www
-              mountPath: /usr/share/nginx/html
-          env:
-            - name: "PHP_EXTRA_CONFIGURE_ARGS"
-              value: "--enable-fpm --with-fpm-user=nginx --with-fpm-group=nginx --disable-cgi"
+              mountPath: /mnt
 
       volumes:
         - name: nginx-conf
           configMap:
             name: nginx-conf
-            defaultMode: 420
+        - name: nginx-default-conf
+          configMap:
+            name: nginx-default-conf
+            items:
+              - key: "default.conf"
+                path: "default.conf"
         - name: www
           persistentVolumeClaim:
             claimName: nginxphp-home
