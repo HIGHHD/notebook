@@ -1,0 +1,11 @@
+image: gitlab/gitlab-runner:alpine-v14.1.0
+logLevel: debug
+gitlabUrl: 'http://192.168.202.159:30018/'
+runnerRegistrationToken: 'ko_UAxEgEDexrHYxFWnH'
+runners:
+  privileged: true
+  executor: shell
+securityContext:
+  runAsUser: 0
+  fsGroup: 0
+

@@ -1,0 +1,6 @@
+externalURL: "https://192.168.202.159:30003"
+expose:
+  type: nodePort
+  tls:
+    auto:
+      commonName: 192.168.202.159

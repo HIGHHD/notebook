@@ -1,0 +1,28 @@
+apiVersion: apps/v1   #接口版本
+kind: Deployment                 #接口类型
+metadata:
+  name: test-nginx               #Deployment名称
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-nginx
+  template:         
+    metadata:
+      labels:
+        app: test-nginx  #模板名称必填
+    spec: #定义容器模板，该模板可以包含多个容器
+      containers:                                                                   
+        - name:  nginx
+          image: nginx:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+          - name: nginx-nfs
+            mountPath: /usr/share/nginx/html
+      volumes:
+      - name: nginx-nfs
+        persistentVolumeClaim:
+          claimName: testpvc

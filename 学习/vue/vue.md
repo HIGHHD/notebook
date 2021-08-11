@@ -44,3 +44,5 @@ data props computed watch methods他们之间的生成顺序是什么呢？
 
 [vue面试题的介绍（附答案）-js教程-PHP中文网](https://www.php.cn/js-tutorial-416386.html)
 
+https://blog.csdn.net/eyeofangel/article/details/88797314
+

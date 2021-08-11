@@ -1,0 +1,68 @@
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: api0
+  name: api0
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30051
+  selector:
+    k8s-app: api0
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: api0-claim
+  namespace: default
+  labels:
+    k8s-app: api0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeMode: Filesystem
+  
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    k8s-app: api0
+  name: api0
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: api0
+  template:
+    metadata:
+      labels:
+        k8s-app: api0
+    spec:
+      containers:
+        - name: api0
+          image: "192.168.202.159:30003/library/api0:v2"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: apihome
+              mountPath: /home
+      volumes:
+        - name: apihome
+          persistentVolumeClaim:
+            claimName: api0-claim
+
+

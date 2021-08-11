@@ -1,0 +1,65 @@
+global:
+  time_zone: 'Asia/Shanghai'
+  edition: ce
+  ingress:
+    class: nginx
+    configureCertmanager: false
+  appConfig:
+    incomingEmail:
+      enable: true
+      host: "mail.sczq.com.cn"
+      port: 25
+      user: "niusiyuansc@sczq.com.cn"
+      password:
+        secret: dc-pwd
+        key: password
+    serviceDeskEmail:
+      enable: true
+      host: "mail.sczq.com.cn"
+      port: 25
+      user: "niusiyuansc@sczq.com.cn"
+      password:
+        secret: dc-pwd
+        key: password
+    ldap:
+      preventSignin: false
+      servers: 
+        main:
+          label: 'LDAP'
+          host: '192.168.1.14'
+          port: 389
+          uid: 'sAMAccountName'
+          bind_dn: 'CN=牛思源,OU=信息技术部,OU=总部,OU=首创证券,DC=sc,DC=local'
+          password:
+            secret: dc-pwd
+            key: password
+          encryption: 'plain'
+nginx-ingress:
+  enabled: false
+gitlab:
+  gitaly:
+    persistence:
+      storageClass: nfs-client
+      size: 5Gi
+redis:
+  persistence:
+    storageClass: nfs-client
+    size: 2Gi
+postgresql:
+  persistence:
+    storageClass: nfs-client
+    size: 5Gi
+minio:
+  persistence:
+    storageClass: nfs-client
+    size: 10Gi
+prometheus:
+  install: false
+certmanager:
+  install: false
+gitlab-runner:
+  #  install: false
+  runners:
+    privileged: true
+tcp:
+  22: "gitlab/mygitlab-gitlab-shell:22"

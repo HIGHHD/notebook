@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-nginx-config
+  namespace: default
+data:
+  nginx.conf: ""   
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: my-nginx-static
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: nfs-client

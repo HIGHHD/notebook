@@ -1,0 +1,15 @@
+existingServerBlockConfigmap: my-nginx-config
+staticSitePVC: my-nginx-static
+ldapDaemon:
+  enabled: false
+  ldapConfig:
+    uri: "ldap://192.168.1.1:389"
+    baseDN: "DC=sc,Dc=local"
+    bindDN: "niusiyuansc@sc.local"
+    bindPassword: "niuSiyuan1992"
+service:
+  type: NodePort
+  nodePorts:
+    http: 30080
+    https: 30443
+

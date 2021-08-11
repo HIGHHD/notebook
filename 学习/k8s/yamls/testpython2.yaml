@@ -1,0 +1,46 @@
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: attendance
+  name: attendance
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+    - port: 5000
+      targetPort: 5000
+      nodePort: 30015
+  selector:
+    k8s-app: attendance
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    k8s-app: attendance
+  name: attendance
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: attendance
+  template:
+    metadata:
+      labels:
+        k8s-app: attendance
+    spec:
+      containers:
+        - name: attendance
+          image: "192.168.202.159:30003/library/attendance:v1"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+              protocol: TCP
+
+

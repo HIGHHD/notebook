@@ -118,9 +118,8 @@ cat > /etc/docker/daemon.json <<EOF
 EOF
 systemctl enable docker && systemctl daemon-reload && systemctl restart docker
 
-# harbor安装完，需要在/etc/docker/daemon.json添加私有仓库地址，例：
- "insecure-registries": ["https://192.168.202.159:30003"],
-
+# harbor安装完，需要在/etc/docker/daemon.json添加私有仓库地址，例
+"insecure-registries": ["https://192.168.202.159:30003"],
 
 # 1.21.2 使用国内镜像报错，需要手动下载coredns并打标签
 docker pull coredns/coredns

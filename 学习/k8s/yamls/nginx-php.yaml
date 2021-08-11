@@ -1,0 +1,166 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sczq
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: nginxphp
+  name: nginxphp
+  namespace: sczq
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+  selector:
+    k8s-app: nginxphp
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-conf
+  namespace: sczq
+  labels:
+    k8s-app: nginxphp
+data:
+  nginxconf: |
+    user  nginx;
+    worker_processes  auto;
+    
+    error_log  /var/log/nginx/error.log notice;
+    pid        /var/run/nginx.pid;
+    
+    
+    events {
+      worker_connections  1024;
+    }
+     
+    http {
+      include       /etc/nginx/mime.types;
+      default_type  application/octet-stream;
+      
+      log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+      
+      access_log  /var/log/nginx/access.log  main;
+      
+      sendfile        on;
+      #tcp_nopush     on;
+      
+      keepalive_timeout  65;
+      
+      gzip  on;
+      
+      #include /etc/nginx/conf.d/*.conf;
+      server {
+        listen       80;
+        listen  [::]:80;
+        server_name  localhost;
+        root /usr/share/nginx/html;
+        location / {
+          index index.html index.htm;
+        }
+        error_page   500 502 503 504  /50x.html;
+        location = /favicon.ico { log_not_found off; access_log off; }
+        location = /robots.txt  { access_log off; log_not_found off; }
+        location ~ \.php$ {
+          fastcgi_pass   127.0.0.1:9000;
+          fastcgi_index  index.php;
+          fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+          include   fastcgi_params;
+        }
+        location ~ /\.ht {
+          deny  all;
+        }
+      }
+    }
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nginxphp-home
+  namespace: sczq
+  labels:
+    k8s-app: nginxphp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeMode: Filesystem
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    k8s-app: nginxphp
+  name: nginxphp
+  namespace: sczq
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: nginxphp
+  template:
+    metadata:
+      labels:
+        k8s-app: nginxphp
+    spec:
+      containers:
+        - name: nginx
+          image: "nginx:1.21.1-alpine"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginxconf
+            - name: www
+              mountPath: /usr/share/nginx/html
+        - name: php
+          image: "php:8.1-rc-fpm-alpine3.14"
+          imagePullPolicy: Always
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - "adduser"
+                  - "-D"
+                  - "-g"
+                  - "nginx"
+                  - "-s"
+                  - "/sbin/nologin"
+                  - "-d"
+                  - "/usr/share/nginx/html"
+                  - "nginx"
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+          volumeMounts:
+            - name: www
+              mountPath: /usr/share/nginx/html
+          env:
+            - name: "PHP_EXTRA_CONFIGURE_ARGS"
+              value: "--enable-fpm --with-fpm-user=nginx --with-fpm-group=nginx --disable-cgi"
+
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: nginx-conf
+            defaultMode: 420
+        - name: www
+          persistentVolumeClaim:
+            claimName: nginxphp-home

@@ -1,0 +1,25 @@
+redash:
+  cookieSecret: XMv+LLTKJcyok2wXudXY1enqWDl5iDydzJhM44bjRYI=
+  secretKey: AfGEUv0yRsG5opSeRo2zsFuhtOoyuFQ5JGhbqNnOxzE=
+  ldapBindDn: "niusiyuansc@sc.local"
+  ldapBindDnPassword: "niuSiyuan1992"
+  ldapSearchDn: "OU=首创证券,DC=sc,Dc=local"
+  ldapUrl: "ldap://192.168.1.1:389"
+  mailServer: "192.168.1.206"
+  mailUsername: "niusiyuansc"
+  mailPassword: "niuSiyuan1992"
+  mailDefaultSender: "niusiyuansc@sczq.com.cn"
+postgresql:
+  postgresqlPassword: ViEM0ZPGJSL5f0s+JANC1ktZVfC9wUjjpLH3xYedB/c=
+  persistence: 
+    storageClass: "nfs-client"
+service:
+  type: "NodePort"
+serviceAccount:
+  name: "redash0"
+env:
+  REDASH_RATELIMIT_ENABLED: false
+  REDASH_ENFORCE_PRIVATE_IP_BLOCK: false
+  REDASH_ALLOW_SCRIPTS_IN_USER_INPUT: true
+  REDASH_LDAP_LOGIN_ENABLED: false 
+  
