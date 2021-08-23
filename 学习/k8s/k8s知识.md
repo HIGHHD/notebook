@@ -180,3 +180,89 @@ volumeBindingMode: WaitForFirstConsumer
 
 延迟卷绑定使得调度器在为 PersistentVolumeClaim 选择一个合适的 PersistentVolume 时能考虑到所有 Pod 的调度限制。
 
+## IP和Port
+
+Kubernetes集群里有三种IP地址，分别如下：
+
+- Node IP：Node节点的IP地址，即物理网卡的IP地址。
+- Pod IP：Pod的IP地址，即docker容器的IP地址，此为虚拟IP地址。
+- Cluster IP：Service的IP地址，此为虚拟IP地址。
+
+**Node IP**
+
+可以是物理机的IP（也可能是虚拟机IP）。每个Service都会在Node节点上开通一个端口，外部可以通过NodeIP:NodePort即可访问Service里的Pod,和我们访问服务器部署的项目一样，IP:端口/项目名
+
+**Pod IP**
+
+Pod IP是每个Pod的IP地址，他是Docker Engine根据docker网桥的IP地址段进行分配的，通常是一个虚拟的二层网络
+
+同Service下的pod可以直接根据PodIP相互通信
+不同Service下的pod在集群间pod通信要借助于 cluster ip
+pod和集群外通信，要借助于node ip
+
+**Cluster IP**
+
+Service的IP地址，此为虚拟IP地址。外部网络无法ping通，只有kubernetes集群内部访问使用。
+
+Cluster IP是一个虚拟的IP，但更像是一个伪造的IP网络，原因有以下几点
+
+1. Cluster IP仅仅作用于Kubernetes Service这个对象，并由Kubernetes管理和分配P地址
+2. Cluster IP无法被ping，他没有一个“实体网络对象”来响应
+3. Cluster IP只能结合Service Port组成一个具体的通信端口，单独的Cluster IP不具备通信的基础，并且他们属于Kubernetes集群这样一个封闭的空间。
+4. 在不同Service下的pod节点在集群间相互访问可以通过Cluster IP
+
+**三种IP网络间的通信**
+
+service地址和pod地址在不同网段，service地址为虚拟地址，不配在pod上或主机上，外部访问时，先到Node节点网络，再转到service网络，最后代理给pod网络。
+
+## Pod和容器
+
+**一：在探讨pod和容器的区别之前，我们先谈谈为什么k8s会使用pod这个最小单元，而不是使用docker的容器，k8s既然使用了pod，当然有它的理由。**
+
+------
+
+1：更利于扩展
+k8s不仅仅支持Docker容器，也支持rkt甚至用户自定义容器，为什么会有这么多不同的容器呢，因为容器并不是真正的虚拟机，参考我之前的博客，docker的一些概念和误区总结，此外，Kubernetes不依赖于底层某一种具体的规则去实现容器技术，而是通过CRI这个抽象层操作容器，这样就会需要pod这样一个东西，pod内部再管理多个业务上紧密相关的用户业务容器，就会更有利用业务扩展pod而不是扩展容器。
+
+------
+
+2：更容易定义一组容器的状态
+
+如果我们没有使用pod，而是直接使用一组容器去跑一个业务呢，那么当其中一个或者若干个容器出现问题呢，我们如何去定义这一组容器的状态呢，通过pod这个概念，这个问题就可以很好的解决，一组业务容器跑在一个k8s的pod中，这个pod中会有一个pause容器，这个容器与其他的业务容器都没有关系，以这个pause容器的状态来代表这个pod的状态，
+
+------
+
+3：利于容器间文件共享，以及通信。
+pause容器有一个ip地址，和一个存储卷，pod中的其他容器共享pause容器的ip地址和存储，这样就做到了文件共享和互信。
+**二：pod和容器的区别**
+总结，pod是k8s的最小单元，容器包含在pod中，一个pod中有一个pause容器和若干个业务容器，而容器就是单独的一个容器，简而言之，pod是一组容器，而容器单指一个容器。
+
+## Deployment 和 Pod
+
+Pod封装了一个或多个应用程序的容器(比如nginx等),存储资源,唯一的网络IP以及管理容器的一些选项
+Pod标示的是一个部署单元,可以理解为Kubernetes中的应用程序的单个实例,它可能由单个容器组成,也可能由少量紧密耦合并共享资源的容器组成。
+
+> 如果多个容器在同一Pod下他们公用一个IP所以不能出现重复的端口号,一个Pod下的多个容器可以使用localhost来访问对方端口
+>
+> 因为Pod是最小的单元，如果在Pod中容器出现异常，Pod终止了是不会重启，在实际使用场景下基本不会直接使用Pod而是使用Deployment部署自己的应用
+
+在早期版本使用Replication Controller对Pod副本数量进行管理，在新的版本中官方推荐使用Deployment来代替RC，Deployment相对RC有这些好处
+
+- Deployment拥有更加灵活强大的升级、回滚功能，并且支持滚动更新
+- 使用Deployment升级Pod只需要定义Pod的最终状态，k8s会为你执行必要的操作(RC要自己定义如何操作)
+  不管是RC还是Deployment解决的主要问题是，每个Pod都运行给定应用程序的单个实例。如果您想水平扩展应用程序（例如，运行多个同样的实例），则应该使用多个Pod，如何管理Pod就是他们的核心
+
+总的来说deployment根据Pod的标签关联到Pod，为了管理pod的生命周期
+
+**Pod被ReplicaSet管理，ReplicaSet控制pod的数量；ReplicaSet被Deployment管理，Deployment控制pod应用的升级、回滚，当然也能控制pod的数量。Service提供一个统一固定入口，负责将前端请求转发给Pod。**
+
+## Pod 间访问
+
+Pod间可以通过内部dns访问，ClusterIP在删除后重新部署会改变，不利于开发，Service的dn构成
+
+`[service-name].[namespace-name].svc.[集群dn]`例如 `redis-master-sr.default.svc.cluster.local`
+
+Kubernetes Service 从逻辑上（网络角度）代表了一组 Pod，具体是哪些 Pod 则是由 label 来挑选。Service 有自己 IP，而且这个 IP 是不变的。客户端只需要访问 Service 的 IP，Kubernetes 则负责建立和维护 Service 与 Pod 的映射关系。无论后端 Pod 如何变化，对客户端不会有任何影响，因为 Service 没有变。
+
+Pod间的容器是共享同一网络的，deployment下的多个容器属于同一Pod，一般一组Pod对应一个Service和一个Deployment
+
