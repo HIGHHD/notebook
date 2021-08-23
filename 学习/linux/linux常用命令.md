@@ -199,3 +199,15 @@ exports文件中可以设定的参数主要有以下这些：
 (17) secure NFS通过1024以下的安全TCP/IP端口发送
 
 (18) insecure NFS通过1024以上的端口发送
+
+
+
+## tar
+
+tar -zxvf go1.17.linux-amd64.tar.gz  -C /usr/local/ 解压文件到指定目录
+
+
+
+## ln
+
+软连接 ln -s 源文件 目标文件
