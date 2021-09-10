@@ -16,3 +16,6 @@ redmine harbor gitlab jenkins
 
 机房监控 隔离墙 前后端合并到一个tomcat下
 
+固收报表主用8001接口，8002接口目前就一个tree接口在被用，可以不迁移，
+
+8001服务使用了数据库中jdbc数据源
