@@ -111,7 +111,8 @@ cat > /etc/docker/daemon.json <<EOF
   "exec-opts": ["native.cgroupdriver=systemd"],
   "log-driver": "json-file",
   "log-opts": {
-    "max-size": "100m"
+    "max-size": "100m",
+    "max-file":"3"
   },
   "registry-mirrors": ["https://b9pmyelo.mirror.aliyuncs.com"]
 }
