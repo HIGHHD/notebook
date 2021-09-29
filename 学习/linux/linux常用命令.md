@@ -211,3 +211,24 @@ tar -zxvf go1.17.linux-amd64.tar.gz  -C /usr/local/ 解压文件到指定目录
 ## ln
 
 软连接 ln -s 源文件 目标文件
+
+
+
+## 时间操作
+
+timedatectl 操作时区，查看当前时间配置
+
+ timedatectl set-timezone 'Asia/Shanghai'
+
+
+
+将UTC时间作为本地时间
+
+ln -sf /usr/share/zoneinfo/Universal /etc/localtime
+
+## 查看cpu
+
+```
+lscpu
+```
+
