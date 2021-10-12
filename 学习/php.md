@@ -35,8 +35,63 @@ PHP-FPM主进程还控制着什么时候创建(处理Web应用更多的流量)�
 
 
 
+
+
+# 记得关闭selinux
+
 ```
 php -i 获取详细配置
 php --ini 获取php-fpm相关配置文件路径
+```
+
+```
+yum -y install openssl openssl-devel curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel install pcre pcre-devel libxslt libxslt-devel bzip2 bzip2-devel
+```
+
+
+
+```
+20181130更新：对于最新的php 7.2.12版本，使用上面参数会警告--enable-gd-native-ttf参数不存在，并且建议使用参数--with-libzip系统库，并且版本需要>=1.11，而centos上最新的yum源版本为1.10版本太低编译时会报错，需要手动编译源码包解决，libzip官网为：https://libzip.org/，进入后点击download下载最新稳定版，这里是libzip-1.5.1.tar.gz，注意libzip编译需要cmake如果没有要先安装cmake，libzip安装如下：
+
+tar -xvzf libzip-1.5.1.tar.gz
+cd libzip-1.5.1
+mkdir build && cd build/
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local/libzip ..
+make && make install
+```
+
+
+
+```
+./configure --prefix=/usr/local/php --with-curl --with-freetype-dir --with-gd --with-gettext --with-iconv-dir --with-kerberos --with-libdir=lib64 --with-libxml-dir --with-mysqli --with-openssl --with-pcre-regex --with-pdo-mysql --with-pdo-sqlite --with-pear --with-png-dir --with-jpeg-dir --with-xmlrpc --with-xsl --with-zlib --with-bz2 --with-mhash --enable-fpm --enable-bcmath --enable-libxml --enable-inline-optimization --enable-mbregex --enable-mbstring --enable-opcache --enable-pcntl --enable-shmop --enable-soap --enable-sockets --enable-sysvsem --enable-sysvshm --enable-xml --enable-zip
+```
+
+
+
+```
+
+
+]# yum install -y epel-release
+
+会在/etc/yum.repos.d目录生成一个epel.repo和epel-testing.repo(测试版)的仓库
+
+   2.2、安装第三方源remi源
+   
+   rpm --httpproxy 192.168.1.166 --httpport 3128 -Uvh http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+
+rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+
+
+安装php
+]# yum -y install php 
+#因为直接用yum-config-manager --enable 指定了php7.2版本了，这里安装的php为7.2版本的
+#安装常用的php模块
+]# yum -y install php php73-php-opcache  php73-php-ldap php73-php-odbc php73-php-pear php73-php-xml php73-php-xmlrpc php73-php-soap curl curl-devel  php73-php-mbstring php73-php-mysqlnd  php73-php-fpm  php73-php-gd
+#安装php-fpm
+]# yum -y install php72-php-fpm.x86_64
+]# systemctl restart php72-php-fpm       #启动php-fpm服务
+]#netstat -tunlp|grep 9000               #查看9000端口是否正常启动了
+
+systemctl start php73-php-fpm.service
 ```
 

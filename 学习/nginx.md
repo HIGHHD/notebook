@@ -11,19 +11,18 @@ make && make install
 ```
 
 ```
+[Unit]
+Description=nginx - high performance web server
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
 Type=forking
-PIDFile=/run/nginx.pid
-# Nginx will fail to start if /run/nginx.pid already exists but has the wrong
-# SELinux context. This might happen when running `nginx -t` from the cmdline.
-# https://bugzilla.redhat.com/show_bug.cgi?id=1268621
-ExecStartPre=/usr/bin/rm -f /run/nginx.pid
-ExecStartPre=/usr/sbin/nginx -t
-ExecStart=/usr/sbin/nginx
-ExecReload=/bin/kill -s HUP $MAINPID
-KillSignal=SIGQUIT
-TimeoutStopSec=5
-KillMode=process
-PrivateTmp=true
+PIDFile=/usr/local/nginx/logs/nginx.pid
+ExecStartPre=/usr/local/nginx/sbin/nginx -t -c /home/api-workspace/sc-api/nginx-conf/nginx.conf
+ExecStart=/usr/sbin/nginx -c /home/api-workspace/sc-api/nginx-conf/nginx.conf
+ExecReload=/usr/sbin/nginx -s reload
+ExecStop=/usr/sbin/nginx -s stop
+
 [Install]
 WantedBy=multi-user.target
 ```

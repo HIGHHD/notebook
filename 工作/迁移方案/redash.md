@@ -2,9 +2,7 @@
 docker save 192.168.202.69:5001/redash:myv9 > redash-myv9.tar
 docker load -i redash-myv9.tar
 
-docker volume create redash_app && \
-docker volume create redash_redis && \
-docker volume create redash_postgres
+docker volume create redash_app
 docker network create -d bridge bridge_net_0
 
 docker volume inspect redash_app //查询实际位置
@@ -28,9 +26,9 @@ x-redash-service: &redash-service
   deploy:
     resources:
       limits:
-        memory: 512M
+        memory: 1G
       reservations:
-        memory: 128M
+        memory: 256M
   volumes:
     - redash_app:/app
   networks:

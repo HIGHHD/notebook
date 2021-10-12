@@ -56,7 +56,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
   mariadb:
-    image: mariadb:10.5
+    image: sczq-mariadb:10.5
     container_name: mariadb
     restart: always
     environment:

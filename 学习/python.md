@@ -1,10 +1,9 @@
 ## 安装
 
 ```
-yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel libffi-devel
+yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel libffi-devel make zlib zlib-devel gcc-c++
 ./configure --prefix=/usr/local/python3/ --enable-optimizations
-make
-make install
+make && make install
 ```
 
 ```
