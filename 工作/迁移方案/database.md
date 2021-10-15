@@ -8,7 +8,7 @@ docker volume create maria_conf
 ```
 FROM mariadb:10.5
 
-RUN echo "Asia/Shanghai" > /etc/timezone && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+RUN echo "Asia/Shanghai" > /etc/timezone && ln -sf /usr/share/zoneinfo/Universal /etc/localtime
 
 VOLUME ["/var/lib/mysql", "/etc/mysql"]
 

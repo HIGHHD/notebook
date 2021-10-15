@@ -117,7 +117,7 @@ proxy=http://192.168.10.154:9999
 ```
 https://github.com/chobits/ngx_http_proxy_connect_module/tree/master
 
-$ cd nginx-1.9.2/
+$ cd nginx-1.18.0/
 $ patch -p1 < /path/to/ngx_http_proxy_connect_module/patch/proxy_connect.patch
 $ ./configure --add-module=/path/to/ngx_http_proxy_connect_module
 $ make && make install
@@ -158,6 +158,9 @@ listen 3128;
 
          proxy_pass $schema://$http_host$request_uri;
          proxy_set_header Host $host;
+             proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP       $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
      
 
 }
