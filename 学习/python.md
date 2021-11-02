@@ -7,6 +7,10 @@ make && make install
 ```
 
 ```
+apt-get install -y build-essential zlib1g-dev libncurses5-dev libg openssl dbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl
+```
+
+```
 vi ~/.bashrc
 PYTHON3=/usr/local/python3/bin
 export PATH=$PYTHON3:$PATH
