@@ -7,7 +7,7 @@ make && make install
 ```
 
 ```
-apt-get install -y build-essential zlib1g-dev libncurses5-dev libg openssl dbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl
+apt-get install -y build-essential zlib1g-dev libncurses5-dev libg openssl dbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl libbz2-dev lzma liblzma-dev
 ```
 
 ```
