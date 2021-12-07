@@ -72,7 +72,7 @@ systemctl enable docker && systemctl start docker
 ```
 FROM openjdk:8u302-jre-slim-buster
 
-RUN echo "Asia/Shanghai" > /etc/timezone && ln -sf /usr/share/zoneinfo/Universal /etc/localtime
+RUN echo "Asia/Shanghai" > /etc/timezone && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 WORKDIR /home
 VOLUME ["/home"]
@@ -90,9 +90,9 @@ CMD ["bash"]
 ```
 FROM tomcat:8.5-jre8-openjdk-slim-buster
 
-RUN ln -sf /usr/share/zoneinfo/Universal /etc/localtime &&  echo "Asia/Shanghai" > /etc/timezone && mkdir -p /files
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime &&  echo "Asia/Shanghai" > /etc/timezone && mkdir -p /files
 
-VOLUME ["/files", "/usr/local/tomcat/webapps"]
+VOLUME ["/files", "/usr/local/tomcat/webapps", "/usr/local/tomcat/conf"]
 
 WORKDIR /usr/local/tomcat/webapps
 CMD ["catalina.sh", "run"]
@@ -111,8 +111,7 @@ FROM nginx:1.21.1-alpine-perl
 
 RUN apk add tzdata \
 && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-&& echo "Asia/Shanghai" > /etc/timezone \
-&& apk del tzdata
+&& echo "Asia/Shanghai" > /etc/timezone 
 
 VOLUME ["/etc/nginx", "/srv"]
 
@@ -142,3 +141,28 @@ CMD ["apache2-foreground"]
 
 用来提供php网站服务，各volume作用：phpapache_conf（apache配置）、phpapache_php_conf（php配置）、 phpapache_srv（网站服务文件）、phpapache_data（网站资源文件）
 
+### python镜像
+
+**Dockerfile**
+
+```
+FROM python:buster
+
+COPY ./requirements.txt /home/
+
+RUN echo "Asia/Shanghai" > /etc/timezone && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    sed -i s/deb.debian.org/mirrors.aliyun.com/g /etc/apt/sources.list && \
+    sed -i s/security.debian.org/mirrors.aliyun.com/g /etc/apt/sources.list && \
+    apt-get update && apt install -y libpq5
+
+RUN pip3 install -r /home/requirements.txt
+
+WORKDIR /srv
+
+VOLUME ["/srv", "/home"]
+EXPOSE 1338
+```
+
+**用途**
+
+python程序运行环境，文档中心、报表中心后台

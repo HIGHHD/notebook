@@ -1,8 +1,11 @@
 ## 安装
 
 ```
-yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel libffi-devel make zlib zlib-devel gcc-c++
+yum -y install openssl openssl-devel zlib-devel bzip2-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel libffi-devel make zlib zlib-devel gcc-c++ readline-devel tk-devel libffi-devel gcc 
 ./configure --prefix=/usr/local/python3/ --enable-optimizations
+
+gcc版本低需要删除 --enable-optimizations 有过make记录需要make clean && make distclean
+
 make && make install
 ```
 

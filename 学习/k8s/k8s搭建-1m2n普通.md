@@ -68,6 +68,9 @@ sysctl --system
 # 时间同步
 yum install ntpdate -y 
 ntpdate 202.120.2.101 # 上海交通大学网络中心NTP服务器地址
+ntpdate 172.21.2.104 #新机房
+
+docker容器时间受宿主机影响
 
 # 若有docker，卸载之
 systemctl stop docker.socket && systemctl stop docker
