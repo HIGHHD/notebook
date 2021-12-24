@@ -26,6 +26,18 @@ sysctl -a | grep net.bridge.bridge #查看是否有以下配置 将桥接的IPv4
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 # 若无则设置，主要等于号两边不要有空格，否则会报错sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-iptables : No such file or directory
+
+vi /etc/sysctl.conf
+
+添加以下内容
+
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+
+最后再执行
+
+sysctl -p
+
 sysctl -w "net.bridge.bridge-nf-call-ip6tables=1"
 sysctl -w "net.bridge.bridge-nf-call-iptables=1"
 # 生效配置
