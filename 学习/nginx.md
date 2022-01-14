@@ -68,7 +68,7 @@ server {　　
 
     location / {
 
-       proxy_pass $schema://$http_host$request_uri;
+       proxy_pass $scheme://$http_host$request_uri;
     
 }
 }
@@ -156,7 +156,7 @@ listen 3128;
      \# forward proxy for non-CONNECT request
      location / {
 
-         proxy_pass $schema://$http_host$request_uri;
+         proxy_pass $scheme://$http_host$request_uri;
          proxy_set_header Host $host;
              proxy_set_header Host $http_host;
     proxy_set_header X-Real-IP       $remote_addr;
