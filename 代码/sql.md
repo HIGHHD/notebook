@@ -20,3 +20,10 @@ select khh,sbrq,count(*) as c from
 having count(*)>10 order by count(*) desc)
 group by khh,sbrq
 ```
+
+
+
+```
+SELECT * FROM TB40.DBO.TB_CNB_PAYRECORDINFO WHERE c_UNITID=35383 AND c_month=1 AND c_year=2022 AND (c_componentname='奖金' OR c_componentname='基本工资') 
+```
+
