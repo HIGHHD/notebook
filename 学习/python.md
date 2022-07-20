@@ -2,7 +2,7 @@
 
 ```
 yum -y install openssl openssl-devel zlib-devel bzip2-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel libffi-devel make zlib zlib-devel gcc-c++ readline-devel tk-devel libffi-devel gcc 
-./configure --prefix=/usr/local/python3/ --enable-optimizations
+./configure --prefix=/usr/local/python3/ --enable-optimizations  --enable-loadable-sqlite-extensions
 
 gcc版本低需要删除 --enable-optimizations 有过make记录需要make clean && make distclean
 
@@ -10,7 +10,7 @@ make && make install
 ```
 
 ```
-apt-get install -y build-essential zlib1g-dev libncurses5-dev libg openssl dbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl libbz2-dev lzma liblzma-dev
+apt-get install -y build-essential zlib1g-dev libncurses5-dev libg openssl dbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl libbz2-dev lzma liblzma-dev sqlite3 libsqlite3-dev
 ```
 
 ```
